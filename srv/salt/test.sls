@@ -1,8 +1,7 @@
-{% set python_pip = 'python-pip' %}
+{% set docker_version = '18.06*' %}
 
 {% if grains['os_family'] in ('Debian') %}
-
-{% set docker_pkg_name = 'docker-ce==18.06*' %}
+{% set python_pip = 'python-pip' %}
 
 debian-reqs:
   pkg.installed:
@@ -21,8 +20,6 @@ docker-repo:
     - refresh: True
 
 {% elif grains['os_family'] in ('RedHat') %}
-
-{% set docker_pkg_name = 'docker-ce-18.06.3.ce' %}
 {% set python_pip = 'python2-pip' %}
 
 redhat-reqs:
@@ -44,7 +41,7 @@ docker-host-pkgs:
   pkg.installed:
     - pkgs:
       - {{ python_pip }}
-      - {{ docker_pkg_name }}
+      - docker-ce: {{ docker_version }}
 
 docker-host-pip:
   pip.installed:
@@ -56,6 +53,10 @@ docker-host-pip:
 wait-for-docker:
   service.running:
     - name: docker
+
+check docker:
+  cmd.run:
+    - name: docker version
 
 test-volume-create:
   docker_volume.present:
